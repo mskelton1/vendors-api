@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@types/jquery": "^3.5.18"
+    "@scriptrunnerhq/vendors-api": "^1.0.6"
   },
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
