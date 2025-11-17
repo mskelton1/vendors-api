@@ -60,6 +60,6 @@
     "url": "https://github.com/scriptrunnerhq/vendors-api"
   },
   "overrides": {
-  "glob": "11.0.4"
+    "glob": "11.0.4"
   }
 }
