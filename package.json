@@ -22,7 +22,6 @@
     "test": "jest"
   },
   "dependencies": {
-    "some-library": "^3.5.18",
     "@scriptrunnerhq/vendors-api": "^1.0.6"
   },
   "devDependencies": {
