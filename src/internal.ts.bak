@@ -1,4 +1,3 @@
-import type { JQuery } from "jquery";
 import type { VendorsBehavioursApi } from "./types";
 
 export const cfidKey = "scriptrunner-vendors-api-cfid";
