@@ -1,4 +1,3 @@
-import type { JQuery } from "jquery";
 import type { VendorsBehavioursApi } from "./types";
 
 export const cfidKey = "scriptrunner-vendors-api-cfid";
@@ -9,20 +8,22 @@ const dataKey = `data-${apiKey}`;
 
 export const hasVendorsApi = (customFieldId: string): boolean => {
   const $field = getApiNode(customFieldId);
-
   return $field != null && $field.data(apiKey) != null;
 };
 
 export const getVendorsApi = (
   customFieldId: string,
-): VendorsBehavioursApi<any> => {
-  return getApiNode(customFieldId).data(apiKey);
+): VendorsBehavioursApi<any> | null => {
+  const $node = getApiNode(customFieldId);
+  return $node ? $node.data(apiKey) : null;
 };
 
-export const getField = (fieldId: string): JQuery<HTMLElement> =>
-  AJS.$(document.getElementById(fieldId));
+export const getField = (fieldId: string): JQuery<HTMLElement> | null => {
+  const el = document.getElementById(fieldId);
+  return el ? AJS.$(el) : null;
+};
 
-export const getApiNode = (fieldId: string): JQuery<HTMLElement> => {
+export const getApiNode = (fieldId: string): JQuery<HTMLElement> | null => {
   const $field = getField(fieldId);
   if ($field == null || $field.attr(dataKey) === "true") {
     return $field;
