@@ -1,6 +1,6 @@
 import * as React from "react";
 import userEvent from "@testing-library/user-event";
-import { act, render, screen } from "@testing-library/react";
+import { act, render, screen, waitFor } from "@testing-library/react";
 
 import VendorApi from "../src";
 import type { PromiseOr, FieldOption, OnChangeCallback } from "../src";
@@ -9,11 +9,8 @@ import { getVendorsApi, hasVendorsApi } from "../src/internal";
 const fieldId = "customfield_100023";
 
 const TestCustomField = () => {
-  // Ref typed to your API's OnChangeCallback
   const onChangeRef = React.useRef<OnChangeCallback<string>>();
-  // Ref initialized with null
   const fieldRef = React.useRef<HTMLInputElement | null>(null);
-  // State explicitly typed
   const [options, setOptions] = React.useState<FieldOption[]>([]);
 
   React.useEffect(() => {
@@ -57,14 +54,18 @@ const TestCustomField = () => {
 };
 
 describe("Vendors API", () => {
-  test("hasVendorsApi", () => {
+  test("hasVendorsApi", async () => {
     render(<TestCustomField />);
-    expect(hasVendorsApi(fieldId)).toEqual(true);
+    await waitFor(() => expect(hasVendorsApi(fieldId)).toBe(true));
   });
 
-  test("setValue", () => {
+  test("setValue", async () => {
     render(<TestCustomField />);
-    getVendorsApi(fieldId)?.setValue("hello world");
+    await waitFor(() => expect(hasVendorsApi(fieldId)).toBe(true));
+
+    const api = getVendorsApi(fieldId)!;
+    api.setValue!("hello world");
+
     expect(screen.getByRole<HTMLInputElement>("textbox").value).toEqual(
       "hello world"
     );
@@ -72,37 +73,53 @@ describe("Vendors API", () => {
 
   test("getValue", async () => {
     render(<TestCustomField />);
+    await waitFor(() => expect(hasVendorsApi(fieldId)).toBe(true));
+
     await userEvent.type(screen.getByRole("textbox"), "ola!");
-    expect(getVendorsApi(fieldId)?.getValue()).toEqual("ola!");
+    const api = getVendorsApi(fieldId)!;
+
+    expect(api.getValue!()).toEqual("ola!");
   });
 
-  test("setReadOnly", () => {
+  test("setReadOnly", async () => {
     render(<TestCustomField />);
+    await waitFor(() => expect(hasVendorsApi(fieldId)).toBe(true));
+
     expect(screen.getByRole<HTMLInputElement>("textbox").readOnly).toEqual(false);
 
-    getVendorsApi(fieldId)?.setReadOnly(true);
+    const api = getVendorsApi(fieldId)!;
+    api.setReadOnly!(true);
     expect(screen.getByRole<HTMLInputElement>("textbox").readOnly).toEqual(true);
 
-    getVendorsApi(fieldId)?.setReadOnly(false);
+    api.setReadOnly!(false);
     expect(screen.getByRole<HTMLInputElement>("textbox").readOnly).toEqual(false);
   });
 
   test("bindOnChange", async () => {
     const callback = jest.fn();
     render(<TestCustomField />);
-    getVendorsApi(fieldId)?.bindOnChange(callback);
+    await waitFor(() => expect(hasVendorsApi(fieldId)).toBe(true));
+
+    const api = getVendorsApi(fieldId)!;
+    api.bindOnChange!(callback);
+
     await userEvent.type(screen.getByRole("textbox"), "fire in the hole!");
     expect(callback).toHaveBeenCalled();
   });
 
-  test("setOptions", () => {
+  test("setOptions", async () => {
     render(<TestCustomField />);
+    await waitFor(() => expect(hasVendorsApi(fieldId)).toBe(true));
+
+    const api = getVendorsApi(fieldId)!;
+
     act(() =>
-      getVendorsApi(fieldId)?.setOptions([
+      api.setOptions!([
         { key: "1", value: "one" },
         { key: "2", value: "two" },
       ])
     );
+
     expect(screen.getByText("one")).toBeVisible();
     expect(screen.getByText("two")).toBeVisible();
   });

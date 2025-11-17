@@ -9,7 +9,7 @@ import { getVendorsApi, hasVendorsApi } from "../src/internal";
 const fieldId = "customfield_100023";
 
 const TestCustomField = () => {
-  // Ref now typed to your API's OnChangeCallback
+  // Ref typed to your API's OnChangeCallback
   const onChangeRef = React.useRef<OnChangeCallback<string>>();
   // Ref initialized with null
   const fieldRef = React.useRef<HTMLInputElement | null>(null);
@@ -64,7 +64,7 @@ describe("Vendors API", () => {
 
   test("setValue", () => {
     render(<TestCustomField />);
-    getVendorsApi(fieldId)!.setValue("hello world");
+    getVendorsApi(fieldId)?.setValue("hello world");
     expect(screen.getByRole<HTMLInputElement>("textbox").value).toEqual(
       "hello world"
     );
@@ -73,24 +73,24 @@ describe("Vendors API", () => {
   test("getValue", async () => {
     render(<TestCustomField />);
     await userEvent.type(screen.getByRole("textbox"), "ola!");
-    expect(getVendorsApi(fieldId)!.getValue()).toEqual("ola!");
+    expect(getVendorsApi(fieldId)?.getValue()).toEqual("ola!");
   });
 
   test("setReadOnly", () => {
     render(<TestCustomField />);
     expect(screen.getByRole<HTMLInputElement>("textbox").readOnly).toEqual(false);
 
-    getVendorsApi(fieldId)!.setReadOnly(true);
+    getVendorsApi(fieldId)?.setReadOnly(true);
     expect(screen.getByRole<HTMLInputElement>("textbox").readOnly).toEqual(true);
 
-    getVendorsApi(fieldId)!.setReadOnly(false);
+    getVendorsApi(fieldId)?.setReadOnly(false);
     expect(screen.getByRole<HTMLInputElement>("textbox").readOnly).toEqual(false);
   });
 
   test("bindOnChange", async () => {
     const callback = jest.fn();
     render(<TestCustomField />);
-    getVendorsApi(fieldId)!.bindOnChange(callback);
+    getVendorsApi(fieldId)?.bindOnChange(callback);
     await userEvent.type(screen.getByRole("textbox"), "fire in the hole!");
     expect(callback).toHaveBeenCalled();
   });
@@ -98,7 +98,7 @@ describe("Vendors API", () => {
   test("setOptions", () => {
     render(<TestCustomField />);
     act(() =>
-      getVendorsApi(fieldId)!.setOptions([
+      getVendorsApi(fieldId)?.setOptions([
         { key: "1", value: "one" },
         { key: "2", value: "two" },
       ])
