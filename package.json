@@ -20,11 +20,12 @@
     "lint": "cross-env TIMING=1 eslint -c .eslintrc.js ./src ./__tests__",
     "clean": "shx rm -rf node_modules dist",
     "test": "jest"
-  },
+{
   "dependencies": {
-    "@types/jquery": "^3.5.18"
+    "some-library": "^3.5.18",
     "@scriptrunnerhq/vendors-api": "^1.0.6"
-  },
+  }
+}
   "devDependencies": {
     "@changesets/cli": "^2.26.2",
     "@changesets/types": "^5.2.1",
