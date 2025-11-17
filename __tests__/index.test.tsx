@@ -9,26 +9,36 @@ import { getVendorsApi, hasVendorsApi } from "../src/internal";
 const fieldId = "customfield_100023";
 
 const TestCustomField = () => {
-  const onChangeRef = React.useRef<(e) => void>();
-  const fieldRef = React.useRef<HTMLInputElement>();
-  const [options, setOptions] = React.useState([]);
+  // Explicitly type the event parameter
+  const onChangeRef = React.useRef<
+    (e: React.ChangeEvent<HTMLInputElement>) => void
+  >();
+
+  // Initialize ref with null instead of undefined
+  const fieldRef = React.useRef<HTMLInputElement | null>(null);
+
+  // Explicitly type state as FieldOption[]
+  const [options, setOptions] = React.useState<FieldOption[]>([]);
 
   React.useEffect(() => {
     VendorApi.init<string>(fieldId, {
       setValue: (value: string): PromiseOr<void> => {
-        fieldRef.current.value = value;
+        if (fieldRef.current) {
+          fieldRef.current.value = value;
+        }
       },
-      getValue: (): PromiseOr<string> => fieldRef.current.value,
+      getValue: (): PromiseOr<string> => fieldRef.current?.value ?? "",
       setReadOnly: (readOnly: boolean): PromiseOr<void> => {
-        fieldRef.current.readOnly = readOnly;
+        if (fieldRef.current) {
+          fieldRef.current.readOnly = readOnly;
+        }
       },
       bindOnChange: (callback: OnChangeCallback<string>): PromiseOr<void> => {
         onChangeRef.current = callback;
       },
-      setOptions: (options: FieldOption[]): PromiseOr<void> =>
-        setOptions(options),
+      setOptions: (opts: FieldOption[]): PromiseOr<void> => setOptions(opts),
     });
-  }, [fieldRef, onChangeRef]);
+  }, []);
 
   return (
     <div>
@@ -45,72 +55,53 @@ const TestCustomField = () => {
   );
 };
 
-describe("Behaviours API", () => {
-  test("hasBehavioursApi", () => {
+describe("Vendors API", () => {
+  test("hasVendorsApi", () => {
     render(<TestCustomField />);
-
     expect(hasVendorsApi(fieldId)).toEqual(true);
   });
 
   test("setValue", () => {
     render(<TestCustomField />);
-
-    getVendorsApi(fieldId).setValue("hello world");
-
+    getVendorsApi(fieldId)?.setValue("hello world");
     expect(screen.getByRole<HTMLInputElement>("textbox").value).toEqual(
-      "hello world",
+      "hello world"
     );
   });
 
   test("getValue", async () => {
     render(<TestCustomField />);
-
     await userEvent.type(screen.getByRole("textbox"), "ola!");
-
-    expect(getVendorsApi(fieldId).getValue()).toEqual("ola!");
+    expect(getVendorsApi(fieldId)?.getValue()).toEqual("ola!");
   });
 
   test("setReadOnly", () => {
     render(<TestCustomField />);
+    expect(screen.getByRole<HTMLInputElement>("textbox").readOnly).toEqual(false);
 
-    expect(screen.getByRole<HTMLInputElement>("textbox").readOnly).toEqual(
-      false,
-    );
+    getVendorsApi(fieldId)?.setReadOnly(true);
+    expect(screen.getByRole<HTMLInputElement>("textbox").readOnly).toEqual(true);
 
-    getVendorsApi(fieldId).setReadOnly(true);
-
-    expect(screen.getByRole<HTMLInputElement>("textbox").readOnly).toEqual(
-      true,
-    );
-
-    getVendorsApi(fieldId).setReadOnly(false);
-
-    expect(screen.getByRole<HTMLInputElement>("textbox").readOnly).toEqual(
-      false,
-    );
+    getVendorsApi(fieldId)?.setReadOnly(false);
+    expect(screen.getByRole<HTMLInputElement>("textbox").readOnly).toEqual(false);
   });
 
   test("bindOnChange", async () => {
     const callback = jest.fn();
     render(<TestCustomField />);
-
-    getVendorsApi(fieldId).bindOnChange(callback);
-
+    getVendorsApi(fieldId)?.bindOnChange(callback);
     await userEvent.type(screen.getByRole("textbox"), "fire in the hole!");
-
     expect(callback).toHaveBeenCalled();
   });
 
   test("setOptions", () => {
     render(<TestCustomField />);
-
     act(() =>
-      getVendorsApi(fieldId).setOptions([
+      getVendorsApi(fieldId)?.setOptions([
         { key: "1", value: "one" },
         { key: "2", value: "two" },
-      ]),
+      ])
     );
-
     expect(screen.getByText("one")).toBeVisible();
     expect(screen.getByText("two")).toBeVisible();
   });
